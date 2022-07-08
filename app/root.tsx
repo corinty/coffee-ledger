@@ -10,17 +10,17 @@ import ClientStyleContext from "./src/ClientStyleContex";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import globalStyles from "./styles/global.css";
 
-// import { getUser } from "./session.server";
+import { getUser } from "./session.server";
 
-// type LoaderData = {
-// user: Awaited<ReturnType<typeof getUser>>;
-// };
+type LoaderData = {
+  user: Awaited<ReturnType<typeof getUser>>;
+};
 
-// export const loader: LoaderFunction = async ({ request }) => {
-// return json<LoaderData>({
-// user: await getUser(request),
-// });
-// };
+export const loader: LoaderFunction = async ({ request }) => {
+  return json<LoaderData>({
+    user: await getUser(request),
+  });
+};
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: globalStyles }];
