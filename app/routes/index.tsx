@@ -1,101 +1,68 @@
-import type { MetaFunction, LoaderFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import React, { useEffect } from "react";
+import { useState } from "react";
+import { Outlet, useLoaderData, useNavigate } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
+import { getActiveBatch } from "~/models/batch.server";
+import { Tabs, Tab, Button } from "@mui/material";
+import { formatShortDate } from "~/utils";
 
-type IndexData = {
-  resources: Array<{ name: string; url: string }>;
-  demos: Array<{ name: string; to: string }>;
+type LoaderData = {
+  activeBatch: Awaited<ReturnType<typeof getActiveBatch>>;
 };
 
-// Loaders provide data to components and are only ever called on the server, so
-// you can connect to a database or run any server side code you want right next
-// to the component that renders it.
-// https://remix.run/api/conventions#loader
-export let loader: LoaderFunction = () => {
-  let data: IndexData = {
-    resources: [
-      {
-        name: "Remix Docs",
-        url: "https://remix.run/docs"
-      },
-      {
-        name: "React Router Docs",
-        url: "https://reactrouter.com/docs"
-      },
-      {
-        name: "Remix Discord",
-        url: "https://discord.gg/VBePs6d"
-      }
-    ],
-    demos: [
-      {
-        to: "demos/actions",
-        name: "Actions"
-      },
-      {
-        to: "demos/about",
-        name: "Nested Routes, CSS loading/unloading"
-      },
-      {
-        to: "demos/params",
-        name: "URL Params and Error Boundaries"
-      }
-    ]
-  };
+export const loader = async () => {
+  const activeBatch = await getActiveBatch();
 
-  // https://remix.run/api/remix#json
-  return json(data);
+  return json({ activeBatch });
 };
 
-// https://remix.run/api/conventions#meta
-export let meta: MetaFunction = () => {
-  return {
-    title: "Remix Starter",
-    description: "Welcome to remix!"
-  };
-};
-
-// https://remix.run/guides/routing#index-routes
 export default function Index() {
-  let data = useLoaderData<IndexData>();
+  const { activeBatch } = useLoaderData<LoaderData>();
+
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
+  const {
+    roast: { name: roastName, roaster },
+    roastDate,
+  } = activeBatch!;
 
   return (
-    <div className="remix__page">
-      <main>
-        <h2>Welcome to Remix!</h2>
-        <p>We're stoked that you're here. 🥳</p>
-        <p>
-          Feel free to take a look around the code to see how Remix does things,
-          it might be a bit different than what you’re used to. When you're
-          ready to dive deeper, we've got plenty of resources to get you
-          up-and-running quickly.
-        </p>
-        <p>
-          Check out all the demos in this starter, and then just delete the{" "}
-          <code>app/routes/demos</code> and <code>app/styles/demos</code>{" "}
-          folders when you're ready to turn this into your next project.
-        </p>
-      </main>
-      <aside>
-        <h2>Demos In This App</h2>
-        <ul>
-          {data.demos.map(demo => (
-            <li key={demo.to} className="remix__page__resource">
-              <Link to={demo.to} prefetch="intent">
-                {demo.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <h2>Resources</h2>
-        <ul>
-          {data.resources.map(resource => (
-            <li key={resource.url} className="remix__page__resource">
-              <a href={resource.url}>{resource.name}</a>
-            </li>
-          ))}
-        </ul>
-      </aside>
-    </div>
+    <main>
+      <section>
+        <h1>{roastName}</h1>
+        <div>
+          <strong>Roaster: </strong>
+          <span>{roaster.name}</span>
+        </div>
+        <div>
+          <strong>Roast Date: </strong>
+          <span>{roastDate && formatShortDate(roastDate)}</span>
+        </div>
+      </section>
+
+      <section style={{ marginTop: 20, display: "flex", gap: 12 }}>
+        <ButtonLink to="/batch">Batches</ButtonLink>
+        <ButtonLink to="/batch/new">New Batch</ButtonLink>
+      </section>
+    </main>
+  );
+}
+
+function ButtonLink({
+  children,
+  to,
+}: {
+  children: React.ReactNode;
+  to: string;
+}) {
+  const navigate = useNavigate();
+  return (
+    <Button variant="contained" onClick={() => navigate(to)}>
+      {children}
+    </Button>
   );
 }
