@@ -1,0 +1,23 @@
+.batch-list {
+  display: grid;
+  gap: 12px;
+}
+.batch {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: black;
+  border: 1px solid black;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.batch-description {
+  text-decoration: unset !important;
+  width: 100%;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+
+  transition: all 0.2s ease;
+}
