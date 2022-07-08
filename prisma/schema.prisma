@@ -1,0 +1,73 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Roaster {
+  id      String  @id @default(cuid())
+  name    String  @unique
+  address String?
+  roasts  Roast[]
+}
+
+model Roast {
+  id        String  @id @default(cuid())
+  name      String
+  roaster   Roaster @relation(fields: [roasterId], references: [id])
+  roasterId String
+  batches   Batch[]
+
+  @@unique([roasterId, name])
+}
+
+model Batch {
+  id            String            @id @default(cuid())
+  roastDate     DateTime?
+  createdAt     DateTime          @default(now())
+  containers    Container[]
+  roast         Roast             @relation(fields: [roastId], references: [id])
+  roastId       String
+  ledgerEntires ContainerLedger[]
+  active        Boolean           @default(false)
+}
+
+model Container {
+  id            String            @id
+  batch         Batch?            @relation(fields: [batchId], references: [id])
+  batchId       String?
+  updatedAt     DateTime          @updatedAt
+  ledgerEntires ContainerLedger[]
+}
+
+model ContainerLedger {
+  id          String    @id @default(cuid())
+  container   Container @relation(fields: [containerId], references: [id])
+  containerId String
+  batch       Batch     @relation(fields: [batchId], references: [id])
+  batchId     String
+  dateIn      DateTime
+  dateOut     DateTime?
+
+  @@unique([containerId, batchId])
+}
+
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  password Password?
+}
+
+model Password {
+  hash String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @unique
+}

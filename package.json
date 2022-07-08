@@ -5,22 +5,47 @@
     "build": "remix build",
     "dev": "remix dev"
   },
+  "prisma": {
+    "seed": "ts-node --require tsconfig-paths/register prisma/seed.ts"
+  },
   "dependencies": {
+    "@date-io/date-fns": "^2.14.0",
+    "@emotion/react": "^11.9.0",
+    "@emotion/server": "^11.4.0",
+    "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/material": "^5.8.1",
+    "@mui/x-data-grid": "^5.12.0",
+    "@mui/x-date-pickers": "^5.0.0-alpha.4",
+    "@prisma/client": "^3.14.0",
     "@remix-run/node": "^1.5.1",
     "@remix-run/react": "^1.5.1",
-    "@remix-run/vercel": "^1.5.1",
-    "@vercel/node": "^2.0.0",
+    "@remix-run/serve": "^1.5.1",
+    "@remix-run/server-runtime": "^1.5.1",
+    "@remix-run/vercel": "^1.6.4",
+    "@remix-validated-form/with-zod": "^2.0.1",
+    "@vercel/node": "^1.8.3",
+    "bcryptjs": "^2.4.3",
+    "date-fns": "^2.28.0",
+    "random-word-slugs": "^0.1.6",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "remix-validated-form": "^4.5.0",
+    "tiny-invariant": "^1.2.0",
+    "zod": "^3.17.3",
+    "zod-form-data": "^1.2.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^1.5.1",
     "@remix-run/eslint-config": "^1.5.1",
     "@remix-run/serve": "^1.5.1",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/node": "^18.0.3",
     "@types/react": "^17.0.45",
     "@types/react-dom": "^17.0.17",
     "eslint": "^8.15.0",
-    "typescript": "^4.6.4"
+    "ts-node": "^10.8.2",
+    "typescript": "^4.7.4"
   },
   "engines": {
     "node": ">=14"
