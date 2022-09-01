@@ -15,21 +15,18 @@ export const roasts: Roast[] = [
 export const batches: Batch[] = [
   {
     id: "b1",
-    active: false,
     createdAt: randomDate(),
     roastDate: randomDate(),
     roastId: "1",
   },
   {
     id: "b2",
-    active: true,
     createdAt: randomDate(),
     roastDate: randomDate(),
     roastId: "2",
   },
   {
     id: "b3",
-    active: true,
     createdAt: randomDate(),
     roastDate: randomDate(),
     roastId: "3",

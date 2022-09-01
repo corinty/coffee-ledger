@@ -15,7 +15,13 @@ async function seed() {
 
   const hashedPassword = await bcrypt.hash("racheliscool", 10);
 
-  const user = await prisma.user.create({
+  await prisma.meta.upsert({
+    where: { key: "active_batch_id" },
+    create: { key: "active_barch_id", value: "b1" },
+    update: { key: "active_barch_id", value: "b1" },
+  });
+
+  await prisma.user.create({
     data: {
       email,
       password: {

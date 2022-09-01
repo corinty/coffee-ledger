@@ -1,10 +1,15 @@
 datasource db {
-  provider = "postgresql"
+  provider = "cockroachdb"
   url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
+}
+
+model meta {
+  key   String @id
+  value String
 }
 
 model Roaster {
@@ -32,7 +37,6 @@ model Batch {
   roast         Roast             @relation(fields: [roastId], references: [id])
   roastId       String
   ledgerEntires ContainerLedger[]
-  active        Boolean           @default(false)
 }
 
 model Container {
