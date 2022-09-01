@@ -51,11 +51,7 @@ export default function ProcessBatch() {
             justifyContent: "flex-end",
           }}
         >
-          <Button
-            style={{ margin: "20px 0" }}
-            variant="outlined"
-            onClick={() => navigate("..")}
-          >
+          <Button style={{ margin: "20px 0" }} variant="outlined" onClick={() => navigate("..")}>
             Done
           </Button>
           <Button variant="contained" type="submit">

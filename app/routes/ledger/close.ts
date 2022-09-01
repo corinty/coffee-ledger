@@ -1,14 +1,20 @@
+import type { ActionFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
+import { zfd } from "zod-form-data";
 import { closeLedgerEntry } from "~/models/containerLedger.server";
 
-export const action = async ({ request }) => {
-  const data = await request.formData();
-  const params = {
-    batchId: data.get("batchId"),
-    containerId: data.get("containerId"),
-  };
+const schema = zfd.formData({
+  batchId: zfd.text(),
+  containerId: zfd.text(),
+});
 
-  await closeLedgerEntry(params);
+export const action: ActionFunction = async ({ request }) => {
+  const { batchId, containerId } = schema.parse(await request.formData());
+
+  await closeLedgerEntry({
+    batchId,
+    containerId,
+  });
 
   return json({ ok: true });
 };

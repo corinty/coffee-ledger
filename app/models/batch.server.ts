@@ -13,12 +13,20 @@ export const getAllBatches = () =>
     orderBy: { createdAt: "desc" },
   });
 
-export const getActiveBatch = () =>
-  prisma.batch.findFirst({
+export const getActiveBatch = async () => {
+  const { value: id } = await prisma.meta.findUnique({
     rejectOnNotFound: true,
-    where: { active: true },
+    where: { key: "active_batch_id" },
+  });
+
+  return prisma.batch.findFirst({
+    rejectOnNotFound: true,
+    where: {
+      id,
+    },
     include,
   });
+};
 
 export const createBatch = (data: Pick<Batch, "roastDate" | "roastId">) =>
   prisma.batch.create({

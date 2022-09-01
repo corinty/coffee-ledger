@@ -17,8 +17,8 @@ async function seed() {
 
   await prisma.meta.upsert({
     where: { key: "active_batch_id" },
-    create: { key: "active_barch_id", value: "b1" },
-    update: { key: "active_barch_id", value: "b1" },
+    create: { key: "active_batch_id", value: "b1" },
+    update: { key: "active_batch_id", value: "b1" },
   });
 
   await prisma.user.create({

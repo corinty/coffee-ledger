@@ -1,5 +1,4 @@
 import type { Batch, Container, ContainerLedger } from "@prisma/client";
-import { json } from "@remix-run/server-runtime";
 import { prisma } from "~/db.server";
 export type { ContainerLedger };
 
@@ -45,6 +44,7 @@ export const closeLedgerEntry = async ({
   date?: string;
 }) => {
   const date = passedDate ? new Date(passedDate) : new Date();
+
   const [container, ledgerEntry] = await prisma.$transaction([
     prisma.container.upsert({
       where: { id: containerId },
