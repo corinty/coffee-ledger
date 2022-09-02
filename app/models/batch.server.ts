@@ -14,15 +14,15 @@ export const getAllBatches = () =>
   });
 
 export const getActiveBatch = async () => {
-  const { value: id } = await prisma.meta.findUnique({
-    rejectOnNotFound: true,
+  const activeBatchId = await prisma.meta.findUnique({
     where: { key: "active_batch_id" },
   });
 
+  if(!activeBatchId) return null
+
   return prisma.batch.findFirst({
-    rejectOnNotFound: true,
     where: {
-      id,
+      id: activeBatchId.value
     },
     include,
   });

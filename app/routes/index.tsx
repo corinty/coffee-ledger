@@ -5,6 +5,7 @@ import { json } from "@remix-run/server-runtime";
 import { getActiveBatch } from "~/models/batch.server";
 import { Tabs, Tab, Button } from "@mui/material";
 import { formatShortDate } from "~/utils";
+import { Batch } from "@prisma/client";
 
 type LoaderData = {
   activeBatch: Awaited<ReturnType<typeof getActiveBatch>>;
@@ -19,21 +20,36 @@ export const loader = async () => {
 export default function Index() {
   const { activeBatch } = useLoaderData<LoaderData>();
 
-  const [value, setValue] = React.useState(0);
+console.log({activeBatch})
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
 
-  const {
-    roast: { name: roastName, roaster },
-    roastDate,
-  } = activeBatch!;
 
   return (
     <main>
+
+      {activeBatch ? <ActiveBatch batch={activeBatch} /> : (
+        <section>
+        No Active Batch Selected
+
+          </section>
+
+      )}
+      <section style={{ marginTop: 20, display: "flex", gap: 12 }}>
+        <ButtonLink to="/batch">Batches</ButtonLink>
+        <ButtonLink to="/batch/new">New Batch</ButtonLink>
+      </section>
+    </main>
+  );
+}
+
+function ActiveBatch({ batch: {roast:{name, roaster},roastDate, id}}:{batch:any}) {
+  return (
       <section>
-        <h1>{roastName}</h1>
+        <h1>{name}</h1>
+        <div>
+          <strong>Batch Id: </strong>
+          <span>{id}</span>
+        </div>
         <div>
           <strong>Roaster: </strong>
           <span>{roaster.name}</span>
@@ -43,13 +59,7 @@ export default function Index() {
           <span>{roastDate && formatShortDate(roastDate)}</span>
         </div>
       </section>
-
-      <section style={{ marginTop: 20, display: "flex", gap: 12 }}>
-        <ButtonLink to="/batch">Batches</ButtonLink>
-        <ButtonLink to="/batch/new">New Batch</ButtonLink>
-      </section>
-    </main>
-  );
+  )
 }
 
 function ButtonLink({

@@ -4,6 +4,8 @@
   "scripts": {
     "prebuild": "npx prisma migrate deploy && npx prisma generate",
     "build": "remix build",
+    "prestart": "npm run build",
+    "start": "remix-serve ./build",
     "dev": "remix dev"
   },
   "prisma": {
