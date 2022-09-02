@@ -1,5 +1,6 @@
 import { Button } from "@mui/material";
-import { Link, Outlet, useLoaderData, useFetcher } from "@remix-run/react";
+import type { ContainerLedger } from "@prisma/client";
+import { Link, Outlet, useLoaderData, useFetcher, useTransition } from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import { getBatchById } from "~/models/batch.server";
@@ -17,7 +18,7 @@ export const loader: LoaderFunction = async ({ params }) => {
 
 export default function Batch() {
   const { batch } = useLoaderData<LoaderData>();
-  const ledgerFetcher = useFetcher();
+  const transition = useTransition();
   return (
     <>
       <nav>
@@ -33,28 +34,53 @@ export default function Batch() {
       </section>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
         <div>
-          <h3>Ledger Entiries</h3>
-          {batch.ledgerEntires.map(({ id, batchId, containerId, dateIn, dateOut }) => (
-            <div key={id}>
-              <ul>
-                <li>ID: {id}</li>
-                <li>Container Id: {containerId}</li>
-                <li>Date In: {dateIn}</li>
-                <li>Date Out: {dateOut}</li>
-              </ul>
-              {!dateOut && (
-                <ledgerFetcher.Form method="delete" action="/ledger/close">
-                  <input type="text" hidden name="containerId" value={containerId} readOnly />
-                  <input type="text" hidden name="batchId" value={batchId} readOnly />
-                  <Button variant="contained" type="submit">
-                    Close Entry
-                  </Button>
-                </ledgerFetcher.Form>
-              )}
-            </div>
-          ))}
+          <h3>Ledger Entiries: open</h3>
+          {batch.ledgerEntires
+            .filter((entry) => !entry.dateOut)
+            .map((entry) => (
+              <LedgerEntry entry={entry} key={entry.id} allowClose />
+            ))}
+        </div>
+        <div>
+          <h3>Ledger Entiries: All </h3>
+          {batch.ledgerEntires
+            .filter((entry) => entry.dateOut)
+            .map((entry) => (
+              <LedgerEntry entry={entry} key={entry.id} />
+            ))}
         </div>
       </div>
     </>
+  );
+}
+
+function LedgerEntry({
+  entry: { id, containerId, dateIn, dateOut, batchId },
+  allowClose,
+}: {
+  entry: ContainerLedger;
+  allowClose?: boolean;
+}) {
+  const ledgerFetcher = useFetcher();
+  return (
+    <div key={id} hidden={Boolean(ledgerFetcher.submission)}>
+      <ul>
+        <li>ID: {id}</li>
+        <li>Container Id: {containerId}</li>
+        <li>Date In: {dateIn}</li>
+        <li>Date Out: {dateOut}</li>
+      </ul>
+      {!dateOut && (
+        <ledgerFetcher.Form method="delete" action="/ledger/close">
+          <input type="text" hidden name="containerId" value={containerId} readOnly />
+          <input type="text" hidden name="batchId" value={batchId} readOnly />
+          {allowClose && (
+            <Button variant="contained" type="submit">
+              Close Entry
+            </Button>
+          )}
+        </ledgerFetcher.Form>
+      )}
+    </div>
   );
 }

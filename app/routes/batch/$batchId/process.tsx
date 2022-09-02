@@ -1,6 +1,7 @@
+import { useEffect, useRef } from "react";
 import { Button, TextField } from "@mui/material";
 import type { Batch } from "@prisma/client";
-import { useOutletContext, useNavigate } from "@remix-run/react";
+import { useOutletContext, useNavigate, Form, useTransition } from "@remix-run/react";
 
 import type { ActionFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
@@ -14,6 +15,7 @@ const schema = zfd.formData({
 
 export const action: ActionFunction = async ({ request }) => {
   const { batchId, containerId } = schema.parse(await request.formData());
+  console.log("processing", { containerId });
 
   const { container, ledgerEntry } = await createLedgerEntry({
     batchId,
@@ -27,16 +29,27 @@ export default function ProcessBatch() {
   const batch = useOutletContext<Batch>();
 
   const navigate = useNavigate();
+  const transition = useTransition();
+  const formRef = useRef<HTMLFormElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!transition.submission) {
+      formRef.current?.reset();
+      inputRef.current?.focus();
+    }
+  }, [transition.submission]);
+
   return (
     <>
       <h4>Process</h4>
-      <form method="post">
+      <Form method="post" replace ref={formRef}>
         <input type="text" name="batchId" hidden value={batch.id} readOnly />
         <TextField
+          disabled={Boolean(transition.submission)}
+          inputRef={inputRef}
           fullWidth
-          onKeyDown={(e) => {
-            if (e.code === "Escape") navigate("..");
-          }}
+          inputProps={{ pattern: "[0-9]*" }}
           label="Container ID"
           required
           autoFocus
@@ -54,11 +67,11 @@ export default function ProcessBatch() {
           <Button style={{ margin: "20px 0" }} variant="outlined" onClick={() => navigate("..")}>
             Done
           </Button>
-          <Button variant="contained" type="submit">
-            Add
+          <Button variant="contained" type="submit" disabled={transition.submission ? true : false}>
+            {transition.submission ? "..." : "Add"}
           </Button>
         </div>
-      </form>
+      </Form>
     </>
   );
 }

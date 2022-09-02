@@ -39,7 +39,7 @@ export function getBatchById({ batchId }: { batchId: Batch["id"] }) {
     where: { id: batchId },
     include: {
       roast: { include: { roaster: true } },
-      ledgerEntires: { orderBy: { dateOut: "asc" } },
+      ledgerEntires: { orderBy: { dateOut: "desc" } },
     },
   });
 }
