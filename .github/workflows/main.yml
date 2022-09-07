@@ -35,7 +35,7 @@ jobs:
           authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
       - name: Add SSH key
         run: |
-          ssh corinty@$(tailscale ip -6 pineapplelab)
+          ssh corinty@$(tailscale ip -6 pineapple-lab)
           cd development/coffee-ledger
           git pull
           pm2 restart coffee-ledger
