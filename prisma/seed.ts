@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { roasts, roasters, batches, containers } from "./seed_data";
+import { roasts, roasters, batches, containers, ledgerEntires } from "./seed_data";
 
 import bcrypt from "bcryptjs";
 import { meta_options } from "~/models/meta.server";
@@ -68,6 +68,18 @@ async function seed() {
       update: data,
     });
   });
+
+  await ledgerEntires.forEach(async (data) => {
+    await prisma.containerLedger.upsert({
+      where: { id: data.id },
+      create: data,
+      update: data,
+    });
+  });
+
+
+
+
 
   console.log(`Database has been seeded. 🌱`);
 }

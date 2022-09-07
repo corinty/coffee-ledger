@@ -1,4 +1,4 @@
-import type { Roaster, Roast, Batch, Container } from "@prisma/client";
+import type { Roaster, Roast, Batch, Container, ContainerLedger } from "@prisma/client";
 
 const randomDate = () =>
   new Date(+new Date() - Math.floor(Math.random() * 10000000000));
@@ -41,3 +41,12 @@ export const containers: Container[] = [
   { id: "5", batchId: null, updatedAt: randomDate() },
   { id: "6", batchId: null, updatedAt: randomDate() },
 ];
+
+export const ledgerEntires: ContainerLedger[] = [
+  { id: "1", batchId: "b1", containerId: "1", dateIn: randomDate(), dateOut: null },
+  { id: "2", batchId: "b1", containerId: "2", dateIn: randomDate(), dateOut: null },
+  { id: "3", batchId: "b1", containerId: "3", dateIn: randomDate(), dateOut: null },
+  { id: "4", batchId: "b2", containerId: "4", dateIn: randomDate(), dateOut: null },
+  { id: "5", batchId: "b2", containerId: "5", dateIn: randomDate(), dateOut: null },
+  { id: "6", batchId: "b2", containerId: "6", dateIn: randomDate(), dateOut: null },
+]
