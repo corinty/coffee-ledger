@@ -38,4 +38,5 @@ jobs:
         with:
           host: pineapple-lab
           username: corinty
+          passwrod: ${{ secrets.PASSWORD }}
           script: cd development/coffee-ledger && git pull && pm2 restart coffee-ledger
