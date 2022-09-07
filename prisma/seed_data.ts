@@ -34,10 +34,10 @@ export const batches: Batch[] = [
 ];
 
 export const containers: Container[] = [
-  { id: "c1", batchId: "b1", updatedAt: randomDate() },
-  { id: "c2", batchId: "b1", updatedAt: randomDate() },
-  { id: "c3", batchId: "b1", updatedAt: randomDate() },
-  { id: "c4", batchId: "b2", updatedAt: randomDate() },
-  { id: "c5", batchId: "b3", updatedAt: randomDate() },
-  { id: "c6", batchId: "b2", updatedAt: randomDate() },
+  { id: "1", batchId: null, updatedAt: randomDate() },
+  { id: "2", batchId: null, updatedAt: randomDate() },
+  { id: "3", batchId: null, updatedAt: randomDate() },
+  { id: "4", batchId: null, updatedAt: randomDate() },
+  { id: "5", batchId: null, updatedAt: randomDate() },
+  { id: "6", batchId: null, updatedAt: randomDate() },
 ];

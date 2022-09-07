@@ -3,6 +3,19 @@ import { red } from "@mui/material/colors";
 
 // Create a theme instance.
 const theme = createTheme({
+  components: {
+    MuiAlert: {
+      defaultProps: {
+        variant: "filled"
+      }
+    },
+    MuiButton: {
+      defaultProps: {
+        variant: "contained",
+        size: "large"
+      }
+    }
+  },
   palette: {
     primary: {
       main: "#556cd6",

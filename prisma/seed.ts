@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { roasts, roasters, batches, containers } from "./seed_data";
 
 import bcrypt from "bcryptjs";
+import { meta_options } from "~/models/meta.server";
 
 const prisma = new PrismaClient();
 
@@ -16,9 +17,9 @@ async function seed() {
   const hashedPassword = await bcrypt.hash("racheliscool", 10);
 
   await prisma.meta.upsert({
-    where: { key: "active_batch_id" },
-    create: { key: "active_batch_id", value: "b1" },
-    update: { key: "active_batch_id", value: "b1" },
+    where: { key: meta_options.activeBatchId },
+    create: { key: meta_options.activeBatchId, value: "b1" },
+    update: { key: meta_options.activeBatchId, value: "b1" },
   });
 
   await prisma.user.create({

@@ -41,15 +41,14 @@ export const closeLedgerEntry = async ({
 }: {
   containerId: Container["id"];
   batchId: Batch["id"];
-  date?: string;
+  date?: string | number;
 }) => {
   const date = passedDate ? new Date(passedDate) : new Date();
 
   const [container, ledgerEntry] = await prisma.$transaction([
-    prisma.container.upsert({
+    prisma.container.update({
       where: { id: containerId },
-      create: { id: containerId },
-      update: { batchId: null },
+      data: { batchId: null },
     }),
     prisma.containerLedger.update({
       where: { containerId_batchId: { containerId, batchId } },

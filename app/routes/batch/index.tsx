@@ -20,7 +20,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function BatchIndex() {
   const { batches } = useLoaderData<LoaderData>();
-  console.table(batches);
   return (
     <main>
       <h2>All Batches</h2>

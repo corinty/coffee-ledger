@@ -21,9 +21,6 @@ export default function Batch() {
   const transition = useTransition();
   return (
     <>
-      <nav>
-        <Link to={"/"}>Home</Link> {">"} <Link to={".."}>Batch</Link> {">"} {batch.id}
-      </nav>
       <h2>Batch: {batch.id} </h2>
 
       <div>Coffee: {batch.roast.name}</div>

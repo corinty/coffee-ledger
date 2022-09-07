@@ -24,7 +24,7 @@ export const action: ActionFunction = async ({ request }) => {
       roastId,
     });
 
-    return redirect(`/batch/${id}`);
+    return redirect(`/batch/${id}/process`);
   } catch (error) {
     throw error;
   }
