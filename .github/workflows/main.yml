@@ -33,10 +33,11 @@ jobs:
         uses: tailscale/github-action@main
         with:
           authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
-      - name: Add SSH key
-        run: |
-          ssh corinty@$(tailscale ip -6 pineapple-lab)
-          cd development/coffee-ledger
-          git pull
-          pm2 restart coffee-ledger
+      - name: check ip
+        run: tailscale ip -6 pineapple-lab
+          
+      - name: tunnel
+        run: ssh corinty@$(tailscale ip -6 pineapple-lab)
+
+
         
