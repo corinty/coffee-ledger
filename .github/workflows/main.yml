@@ -33,11 +33,14 @@ jobs:
         uses: tailscale/github-action@main
         with:
           authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
-      - name: check ip
-        run: tailscale ip -6 pineapple-lab
-          
-      - name: tunnel
-        run: ssh corinty@$(tailscale ip -6 pineapple-lab)
+      - name: ssh-pipeline
+        uses: cross-the-world/ssh-pipeline@v1.2.0
+        with:
+          host: $(tailscale ip -6 pineapple-lab)
+          user: corinty
+          pass: ${{ secrets.PASSWORD }}
+          script: |
+            cd development/coffee-ledger && git pull
 
 
         
