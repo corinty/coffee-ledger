@@ -34,15 +34,9 @@ jobs:
         with:
           authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
       - name: Add SSH key
-        id: ssh
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          mkdir -p ~/.ssh
-          MACHINE_IP="$(tailscale ip -6 pineapple-lab)"
-          ssh-keyscan $MACHINE_IP >> ~/.ssh/known_hosts
-          printf "%s" "$SSH_KEY" > ~/.ssh/key
-          chmod 600 ~/.ssh/key 
-      - name: build and restart
-        run: |
-          ssh -i ~/.ssh/key "corinty@$MACHINE_IP" "cd development/coffee-ledger && git pull"    
+          ssh corinty@$(tailscale ip -6 pineapplelab)
+          cd development/coffee-ledger
+          git pull
+          pm2 restart coffee-ledger
+        
