@@ -34,7 +34,7 @@ jobs:
         with:
           authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
       - name: ssh-pipeline
-        uses: cross-the-world/ssh-pipeline@1.2.0
+        uses: cross-the-world/ssh-pipeline@v1.2.0
         with:
           host: pineapple-lab
           user: corinty
