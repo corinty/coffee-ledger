@@ -30,12 +30,12 @@ jobs:
         run: echo Hello, world!
 
       - name: Connect Tailscale
-        uses: tailscale/github-action@v1
+        uses: tailscale/github-action@main
         with:
           authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
-      - name: ssh-pipeline
-        uses: cross-the-world/ssh-pipeline@v1.2.0
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
         with:
           host: pineapple-lab
-          user: corinty
+          username: corinty
           script: cd development/coffee-ledger && git pull && pm2 restart coffee-ledger
