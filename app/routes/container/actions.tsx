@@ -7,28 +7,32 @@ import {
 } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import { zfd } from "zod-form-data";
-import { format, parse } from "date-fns"
+import { format } from "date-fns"
 
 import { useState, useEffect, useRef } from "react";
-import { Button, TextField, Snackbar, Alert, AlertColor, Stack, ListItem } from "@mui/material";
+import type { AlertColor } from "@mui/material";
+import { Button, TextField, Snackbar, Alert, Stack, ListItem } from "@mui/material";
 import {
   Delete as DeleteIcon,
   Clear as ClearIcon,
   MeetingRoom,
 } from "@mui/icons-material";
 import styles from "~/styles/container/actions.css";
-import { getContainers, openContainer } from "~/models/container.server";
+import type { getContainers } from "~/models/container.server";
+import { openContainer } from "~/models/container.server";
+import { getOpenLedgerEntries } from "~/models/containerLedger.server";
 
 export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
 
 type LoaderData = {
-  containers: Awaited<ReturnType<typeof getContainers>>;
+  containers: Awaited<ReturnType<typeof getOpenLedgerEntries>>;
 }
 
 export async function loader() {
-  const containers = await getContainers({ inFreezer: true, orderBy: { batch: { roastDate: "desc" } } })
+  // const containers = await getContainers({ inFreezer: true, orderBy: [{ batch: { roastDate: "desc" } }, { id: "desc" }] })
+  const containers = await getOpenLedgerEntries()
 
   return json<LoaderData>({ containers })
 
@@ -53,7 +57,7 @@ export async function action({ request }: { request: Request }) {
       return json<ActionData>({ status: "info", message: "Tried to Delete" });
     }
     case "open": {
-      const data = await openContainer({ containerId })
+      await openContainer({ containerId })
 
       return json<ActionData>({ status: "success", message: "Success" });
     }
@@ -144,7 +148,7 @@ export default function Actions() {
           return (
 
             <ListItem key={container.id}>
-              {container.id} | {container?.batch?.roast.name} | {format(new Date(container!.batch!.roastDate!), "MM/dd/yyyy")}
+              {container.id} |{container.batchId}| {container?.batch?.roast.name} | {format(new Date(container!.batch!.roastDate!), "MM/dd/yyyy")} | {container?.containerId}
             </ListItem>
           )
         })}

@@ -40,8 +40,7 @@ export async function openContainer({
 }: {
   containerId: Container["id"];
 }) {
-  const { batchId } = await prisma.container.findUnique({
-    rejectOnNotFound: true,
+  const { batchId } = await prisma.container.findUniqueOrThrow({
     where: { id: containerId }
   })
 

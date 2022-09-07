@@ -18,7 +18,7 @@ export const getActiveBatch = async () => {
     where: { key: "active_batch_id" },
   });
 
-  if(!activeBatchId) return null
+  if (!activeBatchId) return null
 
   return prisma.batch.findFirst({
     where: {
@@ -34,8 +34,7 @@ export const createBatch = (data: Pick<Batch, "roastDate" | "roastId">) =>
   });
 
 export function getBatchById({ batchId }: { batchId: Batch["id"] }) {
-  return prisma.batch.findUnique({
-    rejectOnNotFound: true,
+  return prisma.batch.findUniqueOrThrow({
     where: { id: batchId },
     include: {
       roast: { include: { roaster: true } },
