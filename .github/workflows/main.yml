@@ -32,7 +32,7 @@ jobs:
       - name: Connect Tailscale
         uses: tailscale/github-action@v1
         with:
-          authkey: ${{secrests.TAILSCALE_AUTHKEY}}
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
       - name: ssh-pipeline
         uses: cross-the-world/ssh-pipeline@1.2.0
         with:
