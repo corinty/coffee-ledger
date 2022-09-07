@@ -28,5 +28,5 @@ jobs:
             # git update to latest codebase on main branch
             cd development/coffee-ledger && git pull
             # Restart
-            pm2 restart coffee-ledger
+            npx pm2 restart coffee-ledger
             
