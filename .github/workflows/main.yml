@@ -23,6 +23,7 @@ jobs:
         with:
           host: '${{ secrets.SERVER }}'
           username: 'corinty'
+          password: '${{ secrests.PASSWORD }}'
           script: |
             # git update to latest codebase on main branch
             cd /development/coffee-ledger && git pull
