@@ -18,6 +18,8 @@ jobs:
         uses: tailscale/github-action@main
         with:
           authkey: '${{ secrets.TAILSCALE_AUTHKEY }}'
+      - name: Install PM2
+        run: npm i pm2
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
         with:
