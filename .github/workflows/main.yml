@@ -33,10 +33,12 @@ jobs:
         uses: tailscale/github-action@main
         with:
           authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
-      - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@master
-        with:
-          host: pineapple-lab
-          username: corinty
-          password: ${{ secrets.PASSWORD }}
-          script: cd development/coffee-ledger && git pull && pm2 restart coffee-ledger
+      - name: ssh into server
+        run:
+         ssh corinty@pineapple-lab
+      - name: pull
+        run:
+          cd development/coffee-ledger && git pull
+      - name: build and restart
+        run:
+          pm2 restart coffee-ledger
