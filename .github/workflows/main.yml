@@ -28,7 +28,7 @@ jobs:
           password: '${{ secrets.PASSWORD }}'
           script: |
             # git update to latest codebase on main branch
-            cd development/coffee-ledger && git pull
+            cd development
             # Restart
-            pm2 restart coffee-ledger
+            ./deployt-coffee-ledger
             
