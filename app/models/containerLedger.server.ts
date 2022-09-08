@@ -56,7 +56,8 @@ export const createLedgerEntry = async ({
         where: { OR: entries.map(entry => ({ id: entry.id })) }
       })
     }
-    prisma.container.upsert({
+    console.log({ batchId, containerId })
+    await prisma.container.upsert({
       where: { id: containerId },
       create: { id: containerId, batchId },
       update: { batchId },

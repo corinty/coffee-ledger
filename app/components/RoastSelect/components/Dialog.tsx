@@ -50,7 +50,7 @@ export default function CreateRoastDialog({
         ref={ref}
         method="post"
         action="/roast/new"
-        onSubmit={(e) => {}}
+        onSubmit={(e) => { }}
       >
         <DialogTitle>Add new Coffee Roast</DialogTitle>
         <DialogContent>

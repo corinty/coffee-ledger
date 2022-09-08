@@ -21,11 +21,12 @@ model Roaster {
 }
 
 model Roast {
-  id        String  @id @default(cuid())
-  name      String
-  roaster   Roaster @relation(fields: [roasterId], references: [id])
-  roasterId String
-  batches   Batch[]
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  roaster     Roaster @relation(fields: [roasterId], references: [id])
+  roasterId   String
+  batches     Batch[]
 
   @@unique([roasterId, name])
 }

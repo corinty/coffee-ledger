@@ -17,12 +17,11 @@ export const action: ActionFunction = async ({ request }) => {
   const { batchId, containerId } = schema.parse(await request.formData());
   console.log("processing", { containerId });
 
-  const { container, ledgerEntry } = await createLedgerEntry({
+  await createLedgerEntry({
     batchId,
     containerId,
   });
-
-  return json({ container, ledgerEntry });
+  return json({})
 };
 
 export default function ProcessBatch() {
