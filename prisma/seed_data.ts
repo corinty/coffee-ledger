@@ -7,9 +7,9 @@ export const roasters: Roaster[] = [
   { id: "234", name: "Onyx Coffee Labs", address: null },
 ];
 export const roasts: Roast[] = [
-  { id: "1", name: "Southern Weather", roasterId: "234" },
-  { id: "2", name: "The Big One", roasterId: "234" },
-  { id: "3", name: "Tropical Weather", roasterId: "234" },
+  { id: "1", name: "Southern Weather", roasterId: "234", description: null },
+  { id: "2", name: "The Big One", roasterId: "234", description: null },
+  { id: "3", name: "Tropical Weather", roasterId: "234", description: null },
 ];
 
 export const batches: Batch[] = [

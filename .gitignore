@@ -9,3 +9,7 @@ node_modules
 /public/build
 /api/index.js
 /api/index.js.map
+prisma/prod_data.db-*
+*.wal
+generation
+d

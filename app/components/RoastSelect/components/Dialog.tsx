@@ -6,6 +6,7 @@ import {
   DialogActions,
   Button,
   Autocomplete,
+  TextareaAutosize,
 } from "@mui/material";
 import type { Roast } from "@prisma/client";
 import { useFetcher } from "@remix-run/react";
@@ -60,9 +61,10 @@ export default function CreateRoastDialog({
               id="coffeeName"
               name="coffeeName"
               defaultValue={roastName}
-              label="title"
+              label="Roast Name"
               type="text"
               variant="standard"
+              required
             />
             <Autocomplete
               freeSolo
@@ -77,6 +79,15 @@ export default function CreateRoastDialog({
                   label="Roaster"
                 />
               )}
+            />
+            <TextField
+              margin="dense"
+              id="description"
+              name="description"
+              multiline
+              label="Description"
+              type="text"
+              variant="standard"
             />
           </div>
         </DialogContent>
