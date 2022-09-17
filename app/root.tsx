@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, } from "react";
 import { json } from "@remix-run/node";
 import type {
   LinksFunction,
@@ -12,24 +12,36 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import { withEmotionCache } from "@emotion/react";
+
 import { unstable_useEnhancedEffect as useEnhancedEffect } from "@mui/material";
 import theme from "./src/theme";
 import ClientStyleContext from "./src/ClientStyleContex";
 
-import tailwindStylesheetUrl from "./styles/tailwind.css";
+// import tailwindStylesheetUrl from "./styles/tailwind.css";
 import globalStyles from "./styles/global.css";
 
+
 import { getUser } from "./session.server";
+import { useSocketProvider } from "./hooks/useSocket";
+
+
 
 type LoaderData = {
   user: Awaited<ReturnType<typeof getUser>>;
+  ENV: {
+    SOCKET_SERVER: string
+  }
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
   return json<LoaderData>({
     user: await getUser(request),
+    ENV: {
+      SOCKET_SERVER: process.env.SOCKET_SERVER!
+    },
   });
 };
 
@@ -51,6 +63,11 @@ interface DocumentProps {
 const Document = withEmotionCache(
   ({ children, title }: DocumentProps, emotionCache) => {
     const clientStyleData = useContext(ClientStyleContext);
+    const data = useLoaderData<LoaderData>()
+
+    const SocketProvider = useSocketProvider({ server: data.ENV.SOCKET_SERVER, delayConnection: true })
+
+
 
     // Only executed on client
     useEnhancedEffect(() => {
@@ -88,7 +105,9 @@ const Document = withEmotionCache(
         </head>
         <body>
           <main style={{ maxWidth: 750, margin: "0 auto" }}>
-            {children}
+            <SocketProvider>
+              {children}
+            </SocketProvider>
             <ScrollRestoration />
             <Scripts />
             <LiveReload />
