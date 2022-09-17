@@ -1,12 +1,11 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
-import { Outlet, useLoaderData, useNavigate } from "@remix-run/react";
+import React from "react";
 import { json } from "@remix-run/server-runtime";
 import { getActiveBatch } from "~/models/batch.server";
-import { Tabs, Tab, Button } from "@mui/material";
 import { formatShortDate } from "~/utils";
-import { Batch } from "@prisma/client";
 import { ButtonLink } from "~/components/ButtonLink";
+import { useLoaderData } from "@remix-run/react";
+import ContainerReader from "~/components/ContainerReader";
+import { styled } from "@mui/material";
 
 type LoaderData = {
   activeBatch: Awaited<ReturnType<typeof getActiveBatch>>;
@@ -21,42 +20,51 @@ export const loader = async () => {
 export default function Index() {
   const { activeBatch } = useLoaderData<LoaderData>();
 
+  const Nav = styled("nav")`
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  `
+
   return (
     <main>
       {activeBatch ? <ActiveBatch batch={activeBatch} /> : (
         <section>
-        No Active Batch Selected
+          No Active Batch Selected
 
-          </section>
+        </section>
 
       )}
-      <nav style={{ marginTop: 20, display: "flex", gap: 12, flexWrap:"wrap" }}>
+      <ContainerReader />
+      {/* <nav style={{ marginTop: 20, display: "flex", gap: 12, flexWrap: "wrap" }}> */}
+      <Nav>
         <ButtonLink to="/container/actions">Container Actions</ButtonLink>
-        <div style={{gap: 12, width:"100%"}}>
-          <ButtonLink to="/batch" style={{marginRight:15}}>Batches</ButtonLink>
+        <div style={{ gap: 12, width: "100%" }}>
+          <ButtonLink to="/batch">Batches</ButtonLink>
           <ButtonLink to="/batch/new">New Batch</ButtonLink>
         </div>
-      </nav>
-    </main>
+      </Nav>
+    </main >
   );
 }
 
-function ActiveBatch({ batch: {roast:{name, roaster},roastDate, id}}:{batch:any}) {
+function ActiveBatch({ batch: { roast: { name, roaster }, roastDate, id } }: { batch: any }) {
   return (
-      <section>
-        <h1>{name}</h1>
-        <div>
-          <strong>Batch Id: </strong>
-          <span>{id}</span>
-        </div>
-        <div>
-          <strong>Roaster: </strong>
-          <span>{roaster.name}</span>
-        </div>
-        <div>
-          <strong>Roast Date: </strong>
-          <span>{roastDate && formatShortDate(roastDate)}</span>
-        </div>
-      </section>
+    <section>
+      <h1>{name}</h1>
+      <div>
+        <strong>Batch Id: </strong>
+        <span>{id}</span>
+      </div>
+      <div>
+        <strong>Roaster: </strong>
+        <span>{roaster.name}</span>
+      </div>
+      <div>
+        <strong>Roast Date: </strong>
+        <span>{roastDate && formatShortDate(roastDate)}</span>
+      </div>
+    </section>
   )
 }

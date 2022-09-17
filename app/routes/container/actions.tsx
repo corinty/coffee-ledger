@@ -18,7 +18,6 @@ import {
   MeetingRoom,
 } from "@mui/icons-material";
 import styles from "~/styles/container/actions.css";
-import type { getContainers } from "~/models/container.server";
 import { openContainer } from "~/models/container.server";
 import { getOpenLedgerEntries } from "~/models/containerLedger.server";
 
