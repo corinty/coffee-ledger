@@ -4,7 +4,6 @@ import { getActiveBatch } from "~/models/batch.server";
 import { formatShortDate } from "~/utils";
 import { ButtonLink } from "~/components/ButtonLink";
 import { useLoaderData } from "@remix-run/react";
-import ContainerReader from "~/components/ContainerReader";
 import { styled } from "@mui/material";
 
 type LoaderData = {
@@ -36,7 +35,6 @@ export default function Index() {
         </section>
 
       )}
-      <ContainerReader />
       {/* <nav style={{ marginTop: 20, display: "flex", gap: 12, flexWrap: "wrap" }}> */}
       <Nav>
         <ButtonLink to="/container/actions">Container Actions</ButtonLink>

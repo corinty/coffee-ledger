@@ -19,6 +19,7 @@ export default function NfcReader() {
     });
 
     return () => {
+      if (!socket) return
       socket.off('pong');
     };
   }, [socket]);
