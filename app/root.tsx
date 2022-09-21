@@ -12,9 +12,9 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
 } from "@remix-run/react";
 import { withEmotionCache } from "@emotion/react";
+import { IoProvider } from "socket.io-react-hook"
 
 import { unstable_useEnhancedEffect as useEnhancedEffect } from "@mui/material";
 import theme from "./src/theme";
@@ -25,7 +25,6 @@ import globalStyles from "./styles/global.css";
 
 
 import { getUser } from "./session.server";
-import { useSocketProvider } from "./hooks/useSocket";
 
 
 
@@ -63,9 +62,7 @@ interface DocumentProps {
 const Document = withEmotionCache(
   ({ children, title }: DocumentProps, emotionCache) => {
     const clientStyleData = useContext(ClientStyleContext);
-    const data = useLoaderData<LoaderData>()
 
-    const SocketProvider = useSocketProvider({ server: data.ENV.SOCKET_SERVER, delayConnection: true })
 
 
 
@@ -105,12 +102,18 @@ const Document = withEmotionCache(
         </head>
         <body>
           <main style={{ maxWidth: 750, margin: "0 auto" }}>
-            <SocketProvider>
+            <IoProvider>
               {children}
-            </SocketProvider>
+            </IoProvider>
             <ScrollRestoration />
             <Scripts />
             <LiveReload />
+            <script>
+              {
+
+              }
+              {}
+            </script>
           </main>
         </body>
       </html>

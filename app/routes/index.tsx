@@ -5,6 +5,7 @@ import { formatShortDate } from "~/utils";
 import { ButtonLink } from "~/components/ButtonLink";
 import { useLoaderData } from "@remix-run/react";
 import { styled } from "@mui/material";
+import ContainerUid from "~/components/ContainerUid"
 
 type LoaderData = {
   activeBatch: Awaited<ReturnType<typeof getActiveBatch>>;
@@ -36,6 +37,7 @@ export default function Index() {
 
       )}
       {/* <nav style={{ marginTop: 20, display: "flex", gap: 12, flexWrap: "wrap" }}> */}
+      <ContainerUid />
       <Nav>
         <ButtonLink to="/container/actions">Container Actions</ButtonLink>
         <div style={{ gap: 12, width: "100%" }}>

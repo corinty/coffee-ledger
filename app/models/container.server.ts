@@ -12,6 +12,10 @@ const defaultParams: {
 } = {
   orderBy: { id: "desc" }
 }
+
+
+export const updateContainer = ({ id, ...rest }: Partial<Container>) => prisma.container.update({ where: { id }, data: { ...rest } })
+
 export function getContainers(params: {
   inFreezer?: boolean,
   orderBy?: Prisma.Enumerable<Prisma.ContainerOrderByWithRelationInput>

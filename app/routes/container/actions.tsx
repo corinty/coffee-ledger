@@ -18,8 +18,10 @@ import {
   MeetingRoom,
 } from "@mui/icons-material";
 import styles from "~/styles/container/actions.css";
-import { openContainer } from "~/models/container.server";
+import { openContainer, updateContainer } from "~/models/container.server";
 import { getOpenLedgerEntries } from "~/models/containerLedger.server";
+import ContainerUid from "~/components/ContainerUid";
+import { z } from "zod";
 
 export function links() {
   return [{ rel: "stylesheet", href: styles }];
@@ -39,6 +41,7 @@ export async function loader() {
 
 const schema = zfd.formData({
   containerId: zfd.text(),
+  uid: zfd.text(z.string().optional()),
   action: zfd.text(),
 });
 
@@ -48,10 +51,15 @@ type ActionData = {
   data?: any;
 };
 export async function action({ request }: { request: Request }) {
-  const { action, containerId } = schema.parse(await request.formData());
+  const { action, containerId, uid } = schema.parse(await request.formData());
 
-  console.log({ action, containerId });
   switch (action) {
+    case "update-nfc-uid": {
+      if (!uid) throw "Must have uid"
+      await updateContainer({ id: containerId, uid })
+      return json<ActionData>({ status: "info", "message": "Updated Container Uid" })
+    }
+
     case "delete": {
       return json<ActionData>({ status: "info", message: "Tried to Delete" });
     }
@@ -70,6 +78,7 @@ export default function Actions() {
   const { containers } = useLoaderData<LoaderData>()
   const transistion = useTransition();
   const [alertOpen, setAlertOpen] = useState(false);
+  const [showNFC, setShowNFC] = useState(false)
 
 
 
@@ -109,6 +118,8 @@ export default function Actions() {
           fullWidth
           label="Container ID"
         />
+
+
         <div>
           <Button
             style={{ float: "right" }}
@@ -124,6 +135,7 @@ export default function Actions() {
         </div>
 
         <Button
+          disabled={showNFC}
           fullWidth
           type="submit"
           name="action"
@@ -133,6 +145,7 @@ export default function Actions() {
           Open
         </Button>
         <Button
+          disabled={showNFC}
           fullWidth
           type="submit"
           name="action"
@@ -141,6 +154,29 @@ export default function Actions() {
         >
           Delete
         </Button>
+        {showNFC ? (
+          <>
+            <ContainerUid />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <Button color="secondary" onClick={() => setShowNFC(false)}>
+                Cancel
+              </Button>
+
+
+              <Button
+                type="submit"
+                name="action"
+                value="update-nfc-uid"
+              >Update UID</Button>
+            </div>
+          </>
+        ) : (
+
+          <Button onClick={() => setShowNFC(true)}>
+            Update UID
+          </Button>
+        )}
+
       </Form>
       <Stack>
         {containers.map(container => {

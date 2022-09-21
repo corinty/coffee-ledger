@@ -43,6 +43,7 @@ model Batch {
 
 model Container {
   id            String            @id
+  uid           String?           @unique
   batch         Batch?            @relation(fields: [batchId], references: [id])
   batchId       String?
   updatedAt     DateTime          @updatedAt
