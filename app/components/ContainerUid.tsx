@@ -14,7 +14,7 @@ function beep() {
 }
 
 export function ContainerUid({ onChange }: { onChange?: (id: string) => void }) {
-  const { id, connected, socket, socketServer } = useContainerUid()
+  const { uid: id, connected, socket, socketServer } = useContainerUid()
 
 
   useEffect(() => {
@@ -25,25 +25,23 @@ export function ContainerUid({ onChange }: { onChange?: (id: string) => void }) 
 
 
   return (
-    <div>
-      <div style={{ display: "flex", }}>
-        <TextField
-          InputLabelProps={{ shrink: Boolean(id) }}
-          inputProps={{ readOnly: true }}
-          name="uid"
-          value={id}
-          disabled={!id}
-          helperText={connected ? `Connected to: ${socketServer}` : null}
-          fullWidth
-          label={connected ? "NFC Uid" : "Not Connected to Server..."} />
-        <div onClick={() => {
-          connected ? socket.close() : socket.connect()
-        }}>
-          <TapAndPlay
-            fontSize="large"
-            color={connected ? "success" : "error"}
-            sx={{ my: 1, mx: 1 }} />
-        </div>
+    <div style={{ display: "flex", }}>
+      <TextField
+        InputLabelProps={{ shrink: Boolean(id) }}
+        inputProps={{ readOnly: true }}
+        name="uid"
+        value={id}
+        disabled={!id}
+        helperText={connected ? `Connected to: ${socketServer}` : null}
+        fullWidth
+        label={connected ? "NFC Uid" : "Not Connected to Server..."} />
+      <div onClick={() => {
+        connected ? socket.close() : socket.connect()
+      }}>
+        <TapAndPlay
+          fontSize="large"
+          color={connected ? "success" : "error"}
+          sx={{ my: 1, mx: 1 }} />
       </div>
     </div>
   )

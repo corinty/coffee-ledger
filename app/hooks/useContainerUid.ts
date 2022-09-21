@@ -8,7 +8,7 @@ export const useContainerUid = () => {
 
 
   return {
-    id: lastMessage?.uid,
+    uid: lastMessage?.uid,
     connect: socket.close,
     disconnect: socket.close,
     socket,
