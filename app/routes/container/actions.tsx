@@ -22,6 +22,7 @@ import { openContainer, updateContainer } from "~/models/container.server";
 import { getOpenLedgerEntries } from "~/models/containerLedger.server";
 import ContainerUid from "~/components/ContainerUid";
 import { z } from "zod";
+import { useContainerUid } from "~/hooks/useContainerUid";
 
 export function links() {
   return [{ rel: "stylesheet", href: styles }];
@@ -79,6 +80,7 @@ export default function Actions() {
   const transistion = useTransition();
   const [alertOpen, setAlertOpen] = useState(false);
   const [showNFC, setShowNFC] = useState(false)
+  const { connected } = useContainerUid()
 
 
 
@@ -166,8 +168,9 @@ export default function Actions() {
               <Button
                 type="submit"
                 name="action"
+                disabled={!connected}
                 value="update-nfc-uid"
-              >Update UID</Button>
+              >{connected ? "Update UID" : "No NFC Server"}</Button>
             </div>
           </>
         ) : (
