@@ -56,11 +56,7 @@ export const action: ActionFunction = async ({ request }) => {
         containerId,
       });
     } else if (containerIds) {
-      Promise.all(containerIds.map(async ({ id, uid }) => await createLedgerEntry({
-        batchId,
-        containerId: id,
-        containerUid: uid
-      })))
+      console.log(batchId, containerId, containerIds)
     }
 
   } catch (error) {
