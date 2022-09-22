@@ -7,14 +7,17 @@ import type { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import { createLedgerEntry } from "~/models/containerLedger.server";
 import { zfd } from "zod-form-data";
+import z from "zod"
 import { getContainers } from "~/models/container.server";
 import { useContainerUid } from "~/hooks/useContainerUid";
 import { Delete, TapAndPlay } from "@mui/icons-material";
 
+
 const schema = zfd.formData({
   batchId: zfd.text(),
-  containerId: zfd.text(),
-});
+  containerId: zfd.text(z.string().optional()),
+  containerIds: ""
+}
 
 type LoaderData = {
   containerMapping: { [key: string]: string }
@@ -123,6 +126,35 @@ const NFCProcess = ({ containerMapping }: { containerMapping: { [key: string]: s
       addContainer(uid)
     }
   }, [uid])
+
+  const TagPair = ({ uid, id: passedId }: { uid: String, id: String | null }) => {
+    const [id, setId] = useState(passedId)
+    return (
+      <div style={{ display: "flex", gap: 6 }}>
+        <input type="text" name="containerIds" value={JSON.stringify({ uid, id })} />
+        <TextField
+          disabled={true}
+          value={uid}
+          inputProps={{ readonly: true }}
+          label="NFC UID"
+          onClick={() => removeContainer(uid)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Delete />
+              </InputAdornment>
+            )
+          }} />
+        <TextField
+          defaultValue={id}
+          inputProps={{ pattern: "[0-9]*" }}
+          onChange={(e) => {
+            setId(e.target.value)
+          }} required label="Container ID" />
+      </div>
+
+    )
+  }
   return (
     <>
       <div
@@ -143,22 +175,7 @@ const NFCProcess = ({ containerMapping }: { containerMapping: { [key: string]: s
       </div>
 
       {Array.from(containers.entries()).map(([uid, id]) => (
-        <div key={uid} style={{ display: "flex", gap: 6 }}>
-          <TextField
-            disabled={true}
-            value={uid}
-            inputProps={{ readonly: true }}
-            label="NFC UID"
-            onClick={() => removeContainer(uid)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Delete />
-                </InputAdornment>
-              )
-            }} />
-          <TextField name="" defaultValue={id} required label="Container ID" />
-        </div>
+        <TagPair uid={uid} id={id} key={uid} />
       ))}
     </>
   )
