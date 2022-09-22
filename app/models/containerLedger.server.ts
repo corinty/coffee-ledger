@@ -25,10 +25,12 @@ export const getOpenLedgerEntries = async () => {
 
 export const createLedgerEntry = async ({
   containerId,
+  containerUid,
   batchId,
   date: passedDate,
 }: {
   containerId: Container["id"];
+  containerUid?: Container["uid"];
   batchId: Batch["id"];
   date?: string;
 }) => {
@@ -59,8 +61,8 @@ export const createLedgerEntry = async ({
     console.log({ batchId, containerId })
     await prisma.container.upsert({
       where: { id: containerId },
-      create: { id: containerId, batchId },
-      update: { batchId },
+      create: { id: containerId, batchId, uid: containerUid },
+      update: { batchId, uid: containerUid },
     })
     return prisma.containerLedger.upsert({
       where: { containerId_batchId: { containerId, batchId } },

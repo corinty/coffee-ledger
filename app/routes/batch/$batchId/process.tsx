@@ -7,7 +7,8 @@ import type { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import { createLedgerEntry } from "~/models/containerLedger.server";
 import { zfd } from "zod-form-data";
-import z from "zod"
+import z from "zod";
+
 import { getContainers } from "~/models/container.server";
 import { useContainerUid } from "~/hooks/useContainerUid";
 import { Delete, TapAndPlay } from "@mui/icons-material";
@@ -16,8 +17,13 @@ import { Delete, TapAndPlay } from "@mui/icons-material";
 const schema = zfd.formData({
   batchId: zfd.text(),
   containerId: zfd.text(z.string().optional()),
-  containerIds: ""
-}
+  containerIds: zfd.repeatableOfType(zfd.json(
+    z.object({
+      uid: z.string(),
+      id: z.string()
+    })
+  ))
+})
 
 type LoaderData = {
   containerMapping: { [key: string]: string }
@@ -38,13 +44,30 @@ export const loader: LoaderFunction = async ({ request }) => {
 }
 
 export const action: ActionFunction = async ({ request }) => {
-  const { batchId, containerId } = schema.parse(await request.formData());
-  console.log("processing", { containerId });
+  try {
+    const { batchId, containerId, containerIds } = schema.parse(await request.formData());
 
-  await createLedgerEntry({
-    batchId,
-    containerId,
-  });
+    console.log("processing", { containerId });
+
+    if (containerId) {
+
+      await createLedgerEntry({
+        batchId,
+        containerId,
+      });
+    } else if (containerIds) {
+      Promise.all(containerIds.map(async ({ id, uid }) => await createLedgerEntry({
+        batchId,
+        containerId: id,
+        containerUid: uid
+      })))
+    }
+
+  } catch (error) {
+    throw error
+
+  }
+
   return json({})
 };
 
@@ -103,7 +126,7 @@ export default function ProcessBatch() {
 }
 
 const NFCProcess = ({ containerMapping }: { containerMapping: { [key: string]: string } }) => {
-  const [containers, setContainers] = useState<Map<string, string | null>>(new Map([["047f2762af4f80", "53"], ["333", null]]))
+  const [containers, setContainers] = useState<Map<string, string | null>>(new Map([["047f2762af4f80", "5223"], ["333323fsdf3", null]]))
   const { uid, connected, socket, socketServer } = useContainerUid()
 
   const addContainer = (uid) => setContainers(cur => {
