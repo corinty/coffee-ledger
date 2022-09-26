@@ -25,54 +25,60 @@ export const getOpenLedgerEntries = async () => {
 
 export const createLedgerEntry = async ({
   containerId,
-  containerUid,
   batchId,
   date: passedDate,
 }: {
   containerId: Container["id"];
-  containerUid?: Container["uid"];
   batchId: Batch["id"];
   date?: string;
 }) => {
   const date = passedDate ? new Date(passedDate) : new Date();
 
-
-  const ledgerEntry = await prisma.$transaction(async prisma => {
-    const entries = await prisma.containerLedger.findMany({
-      select: {
-        id: true
-      },
-      where: {
-        containerId: containerId,
-        dateOut: null
-      },
-      orderBy: {
-        dateIn: "asc"
-      }
-    })
-
-    if (entries.length > 1) {
-      // Keep the latest entry and delete the rest
-      entries.pop()
-      await prisma.containerLedger.deleteMany({
-        where: { OR: entries.map(entry => ({ id: entry.id })) }
+  try {
+    const ledgerEntry = await prisma.$transaction(async prisma => {
+      const entries = await prisma.containerLedger.findMany({
+        select: {
+          id: true
+        },
+        where: {
+          containerId: containerId,
+          dateOut: null
+        },
+        orderBy: {
+          dateIn: "asc"
+        }
       })
-    }
-    console.log({ batchId, containerId })
-    await prisma.container.upsert({
-      where: { id: containerId },
-      create: { id: containerId, batchId, uid: containerUid },
-      update: { batchId, uid: containerUid },
+
+      if (entries.length > 1) {
+        // Keep the latest entry and delete the rest
+        entries.pop()
+        await prisma.containerLedger.deleteMany({
+          where: { OR: entries.map(entry => ({ id: entry.id })) }
+        })
+      }
+      await prisma.container.upsert({
+        where: { id: containerId },
+        create: {
+          id: containerId,
+          batchId,
+        },
+        update: { batchId },
+      })
+      return prisma.containerLedger.upsert({
+        where: { containerId_batchId: { containerId, batchId } },
+        update: { dateIn: date, batchId, containerId, dateOut: null },
+        create: { dateIn: date, batchId, containerId },
+      })
     })
-    return prisma.containerLedger.upsert({
-      where: { containerId_batchId: { containerId, batchId } },
-      update: { dateIn: date, batchId, containerId, dateOut: null },
-      create: { dateIn: date, batchId, containerId },
-    })
-  })
+    return { ledgerEntry }
 
 
-  return { ledgerEntry }
+  } catch (error) {
+    console.error(error)
+  }
+
+
+
 };
 
 export const closeLedgerEntry = async ({

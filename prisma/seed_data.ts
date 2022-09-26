@@ -34,12 +34,12 @@ export const batches: Batch[] = [
 ];
 
 export const containers: Container[] = [
-  { id: "1", batchId: null, updatedAt: randomDate() },
-  { id: "2", batchId: null, updatedAt: randomDate() },
-  { id: "3", batchId: null, updatedAt: randomDate() },
-  { id: "4", batchId: null, updatedAt: randomDate() },
-  { id: "5", batchId: null, updatedAt: randomDate() },
-  { id: "6", batchId: null, updatedAt: randomDate() },
+  { id: "1", batchId: null, updatedAt: randomDate(), nfcTagUid: null },
+  { id: "2", batchId: null, updatedAt: randomDate(), nfcTagUid: null },
+  { id: "3", batchId: null, updatedAt: randomDate(), nfcTagUid: null },
+  { id: "4", batchId: null, updatedAt: randomDate(), nfcTagUid: null },
+  { id: "5", batchId: null, updatedAt: randomDate(), nfcTagUid: null },
+  { id: "6", batchId: null, updatedAt: randomDate(), nfcTagUid: null },
 ];
 
 export const ledgerEntires: ContainerLedger[] = [

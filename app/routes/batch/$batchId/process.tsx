@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, InputAdornment, TextField } from "@mui/material";
-import type { Batch } from "@prisma/client";
+import type { Batch, NfcTag } from "@prisma/client";
 import { useOutletContext, useNavigate, Form, useTransition, useLoaderData } from "@remix-run/react";
 
 import type { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
@@ -12,6 +12,8 @@ import z from "zod";
 import { getContainers } from "~/models/container.server";
 import { useContainerUid } from "~/hooks/useContainerUid";
 import { Delete, TapAndPlay } from "@mui/icons-material";
+import { updateNfcTag } from "~/models/nfcTag.server";
+import { prisma } from "~/db.server";
 
 
 const schema = zfd.formData({
@@ -26,28 +28,22 @@ const schema = zfd.formData({
 })
 
 type LoaderData = {
-  containerMapping: { [key: string]: string }
+  containerMapping: { [key: NfcTag["uid"]]: NfcTag["containerId"] }
 }
 
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const containers = await getContainers()
+  const nfcTags = await prisma.nfcTag.findMany()
 
-  const containerMapping = containers.reduce((prev, cur) => {
-    if (cur.uid) {
-      prev[cur.uid] = cur.id
-    }
-    return prev
-  }, {}) as { [key: string]: string }
 
-  return json<LoaderData>({ containerMapping })
+
+  return json<LoaderData>({ containerMapping: Object.fromEntries(nfcTags.map(tag => [tag.uid, tag.containerId])) })
 }
 
 export const action: ActionFunction = async ({ request }) => {
   try {
     const { batchId, containerId, containerIds } = schema.parse(await request.formData());
 
-    console.log("processing", { containerId });
 
     if (containerId) {
 
@@ -56,10 +52,18 @@ export const action: ActionFunction = async ({ request }) => {
         containerId,
       });
     } else if (containerIds) {
-      console.log(batchId, containerId, containerIds)
+      console.log("building it all up")
+      const allThings = await Promise.all(containerIds.map(({ id, uid }) => (
+        [
+          updateNfcTag({ containerId: id, uid }),
+          createLedgerEntry({ batchId, containerId: id })
+        ]
+      )).flat())
+      console.log(allThings)
     }
 
   } catch (error) {
+    console.log("error happened", error)
     throw error
 
   }
@@ -71,6 +75,7 @@ export default function ProcessBatch() {
   const batch = useOutletContext<Batch>();
   const data = useLoaderData<LoaderData>()
   const { containerMapping } = data
+  console.log("the data", { containerMapping })
 
   const navigate = useNavigate();
   const transition = useTransition();
@@ -121,15 +126,9 @@ export default function ProcessBatch() {
   );
 }
 
-const NFCProcess = ({ containerMapping }: { containerMapping: { [key: string]: string } }) => {
-  const [containers, setContainers] = useState<Map<string, string | null>>(new Map([["047f2762af4f80", "5223"], ["333323fsdf3", null]]))
+const NFCProcess = ({ containerMapping }: { containerMapping: { [key: NfcTag["uid"]]: NfcTag["containerId"] } }) => {
+  const [containers, setContainers] = useState<Map<string, string | null>>(new Map())
   const { uid, connected, socket, socketServer } = useContainerUid()
-
-  const addContainer = (uid) => setContainers(cur => {
-    const next = new Map(cur)
-    next.set(uid, containerMapping[uid])
-    return next
-  })
 
   const removeContainer = (uid) => setContainers(cur => {
     const next = new Map(cur)
@@ -142,19 +141,24 @@ const NFCProcess = ({ containerMapping }: { containerMapping: { [key: string]: s
     console.log("the uid changing", uid)
     if (uid && !containers.has(uid)) {
 
-      addContainer(uid)
+      setContainers(cur => {
+        const next = new Map(cur)
+        next.set(uid, containerMapping[uid])
+        return next
+      })
+
     }
-  }, [uid])
+  }, [containerMapping, containers, uid])
 
   const TagPair = ({ uid, id: passedId }: { uid: String, id: String | null }) => {
     const [id, setId] = useState(passedId)
     return (
       <div style={{ display: "flex", gap: 6 }}>
-        <input type="text" name="containerIds" value={JSON.stringify({ uid, id })} />
+        <input type="text" name="containerIds" hidden readOnly value={JSON.stringify({ uid, id })} />
         <TextField
           disabled={true}
           value={uid}
-          inputProps={{ readonly: true }}
+          inputProps={{ readOnly: true }}
           label="NFC UID"
           onClick={() => removeContainer(uid)}
           InputProps={{

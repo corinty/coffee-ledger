@@ -23,7 +23,13 @@ export function getContainers(params: {
   const { inFreezer, orderBy } = { ...defaultParams, ...params }
   return prisma.container.findMany({
     orderBy,
-    include: { batch: { include: { roast: { include: { roaster: true } } } } },
+    include: {
+      nfcTag: true,
+      batch: {
+        include: { roast: { include: { roaster: true } } }
+      }
+    },
+
     ...(inFreezer && { where: { NOT: { batch: null } } }),
   });
 }

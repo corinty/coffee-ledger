@@ -41,13 +41,20 @@ model Batch {
   ledgerEntires ContainerLedger[]
 }
 
+model NfcTag {
+  uid         String    @id
+  container   Container @relation(fields: [containerId], references: [id])
+  containerId String    @unique
+}
+
 model Container {
   id            String            @id
-  uid           String?           @unique
   batch         Batch?            @relation(fields: [batchId], references: [id])
   batchId       String?
   updatedAt     DateTime          @updatedAt
   ledgerEntires ContainerLedger[]
+  nfcTagUid     String?           @unique
+  nfcTag        NfcTag?
 }
 
 model ContainerLedger {
