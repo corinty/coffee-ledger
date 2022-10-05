@@ -23,6 +23,7 @@ import { getOpenLedgerEntries } from "~/models/containerLedger.server";
 import ContainerUid from "~/components/ContainerUid";
 import { z } from "zod";
 import { useContainerUid } from "~/hooks/useContainerUid";
+import { updateDisplay } from "~/models/meta.server";
 
 export function links() {
   return [{ rel: "stylesheet", href: styles }];
@@ -57,7 +58,7 @@ export async function action({ request }: { request: Request }) {
   switch (action) {
     case "update-nfc-uid": {
       if (!uid) throw "Must have uid"
-      await updateContainer({ id: containerId, uid })
+      await updateContainer({ id: containerId, nfcTagUid: uid })
       return json<ActionData>({ status: "info", "message": "Updated Container Uid" })
     }
 
@@ -65,7 +66,8 @@ export async function action({ request }: { request: Request }) {
       return json<ActionData>({ status: "info", message: "Tried to Delete" });
     }
     case "open": {
-      await openContainer({ containerId })
+      const { batch: { roastDate, roast: { name } } } = await openContainer({ containerId })
+      await updateDisplay({ name, date: roastDate! })
 
       return json<ActionData>({ status: "success", message: "Success" });
     }
@@ -81,6 +83,9 @@ export default function Actions() {
   const [alertOpen, setAlertOpen] = useState(false);
   const [showNFC, setShowNFC] = useState(false)
   const { connected } = useContainerUid()
+
+
+  const isSubmitting = transistion.state == "submitting"
 
 
 
@@ -115,7 +120,7 @@ export default function Actions() {
           name="containerId"
           defaultValue={containerId || ""}
           required
-          disabled={Boolean(transistion.submission)}
+          disabled={isSubmitting}
           inputProps={{ pattern: "[0-9]*" }}
           fullWidth
           label="Container ID"
@@ -137,7 +142,7 @@ export default function Actions() {
         </div>
 
         <Button
-          disabled={showNFC}
+          disabled={showNFC || isSubmitting}
           fullWidth
           type="submit"
           name="action"
@@ -147,7 +152,7 @@ export default function Actions() {
           Open
         </Button>
         <Button
-          disabled={showNFC}
+          disabled={showNFC || isSubmitting}
           fullWidth
           type="submit"
           name="action"

@@ -5,6 +5,7 @@ import type { Prisma } from "@prisma/client";
 import type { Container } from "@prisma/client";
 import { closeLedgerEntry } from "./containerLedger.server";
 import { meta_options } from "./meta.server";
+import { setActiveBatch } from "./batch.server";
 export type { Container } from "@prisma/client";
 
 const defaultParams: {
@@ -51,32 +52,24 @@ export async function openContainer({
   containerId: Container["id"];
 }) {
   const { batchId } = await prisma.container.findUniqueOrThrow({
-    where: { id: containerId }
+    where: { id: containerId },
+    include: { batch: { include: { roast: true } } }
   })
+
+
 
   if (!batchId) {
     throw new Error(`No Connected Batch Found for container id: "${containerId}"`)
   }
-  const entry = await closeLedgerEntry({
+  await closeLedgerEntry({
     batchId: batchId,
     containerId,
     date: new Date().toString()
   })
 
-  const meta = await prisma.meta.upsert({
-    where: {
-      key: meta_options.activeBatchId
-    },
-    create: {
-      key: meta_options.activeBatchId,
-      value: batchId
-    },
-    update: {
-      value: batchId
-    }
-  })
+  const batch = await setActiveBatch(batchId)
 
-  return { ...entry, meta }
+  return { batch }
 
 
 }
