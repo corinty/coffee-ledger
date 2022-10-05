@@ -9,11 +9,9 @@ import { createLedgerEntry } from "~/models/containerLedger.server";
 import { zfd } from "zod-form-data";
 import z from "zod";
 
-import { getContainers } from "~/models/container.server";
 import { useContainerUid } from "~/hooks/useContainerUid";
 import { Delete, TapAndPlay } from "@mui/icons-material";
-import { updateNfcTag } from "~/models/nfcTag.server";
-import { prisma } from "~/db.server";
+import { updateNfcTag, getContainerMapping } from "~/models/nfcTag.server";
 
 
 const schema = zfd.formData({
@@ -33,11 +31,10 @@ type LoaderData = {
 
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const nfcTags = await prisma.nfcTag.findMany()
 
 
 
-  return json<LoaderData>({ containerMapping: Object.fromEntries(nfcTags.map(tag => [tag.uid, tag.containerId])) })
+  return json<LoaderData>({ containerMapping: await getContainerMapping() })
 }
 
 export const action: ActionFunction = async ({ request }) => {

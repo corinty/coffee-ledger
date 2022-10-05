@@ -15,3 +15,5 @@ export const updateNfcTag = async ({
   create: { uid, containerId },
   update: { containerId }
 })
+
+export const getContainerMapping = async () => Object.fromEntries((await prisma.nfcTag.findMany()).map(tag => [tag.uid, tag.containerId]))

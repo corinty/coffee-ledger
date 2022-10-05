@@ -1,6 +1,7 @@
 import type { Batch } from "@prisma/client";
 import { prisma } from "~/db.server";
 import { generateSlug } from "random-word-slugs";
+import { meta_options } from "./meta.server";
 
 const include = { roast: { include: { roaster: true } } };
 
@@ -27,6 +28,17 @@ export const getActiveBatch = async () => {
     include,
   });
 };
+
+export const setActiveBatch = (id: Batch["id"]) => {
+  prisma.meta.upsert({
+    where: { key: meta_options.activeBatchId },
+    create: { key: meta_options.activeBatchId, value: id },
+    update: { value: id }
+  })
+
+  return prisma.batch.findUniqueOrThrow({ where: { id }, include })
+}
+
 
 export const createBatch = (data: Pick<Batch, "roastDate" | "roastId">) =>
   prisma.batch.create({
