@@ -1,22 +1,18 @@
-import { Button } from "@mui/material";
-import { useNavigate, Link } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 
 export function ButtonLink({
-  className,
   children,
   to,
-  ...rest
 }: {
   className?: any;
   children: React.ReactNode;
   to: string;
 }) {
-  const navigate = useNavigate();
   return (
-    <Link to={to} className="nav-button-link">
-      <Button onClick={() => navigate(to)} {...rest} className={className} style={{ textDecoration: "none" }}>
+    <div className="not-prose">
+      <Link to={to} className="btn btn-primary no-animation">
         {children}
-      </Button>
-    </Link>
+      </Link>
+    </div>
   );
 }

@@ -7,23 +7,30 @@ import {
 } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import { zfd } from "zod-form-data";
-import { format } from "date-fns"
+import { format } from "date-fns";
 
 import { useState, useEffect, useRef } from "react";
 import type { AlertColor } from "@mui/material";
-import { Button, TextField, Snackbar, Alert, Stack, ListItem } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Snackbar,
+  Alert,
+  Stack,
+  ListItem,
+} from "@mui/material";
 import {
   Delete as DeleteIcon,
   Clear as ClearIcon,
   MeetingRoom,
 } from "@mui/icons-material";
 import styles from "~/styles/container/actions.css";
-import { openContainer, updateContainer } from "~/models/container.server";
 import { getOpenLedgerEntries } from "~/models/containerLedger.server";
 import ContainerUid from "~/components/ContainerUid";
 import { z } from "zod";
 import { useContainerUid } from "~/hooks/useContainerUid";
 import { updateDisplay } from "~/models/meta.server";
+import { openContainer, updateContainer } from "~/models/container.server";
 
 export function links() {
   return [{ rel: "stylesheet", href: styles }];
@@ -31,14 +38,13 @@ export function links() {
 
 type LoaderData = {
   containers: Awaited<ReturnType<typeof getOpenLedgerEntries>>;
-}
+};
 
 export async function loader() {
   // const containers = await getContainers({ inFreezer: true, orderBy: [{ batch: { roastDate: "desc" } }, { id: "desc" }] })
-  const containers = await getOpenLedgerEntries()
+  const containers = await getOpenLedgerEntries();
 
-  return json<LoaderData>({ containers })
-
+  return json<LoaderData>({ containers });
 }
 
 const schema = zfd.formData({
@@ -57,19 +63,24 @@ export async function action({ request }: { request: Request }) {
 
   switch (action) {
     case "update-nfc-uid": {
-      if (!uid) throw "Must have uid"
-      await updateContainer({ id: containerId, nfcTagUid: uid })
-      return json<ActionData>({ status: "info", "message": "Updated Container Uid" })
+      if (!uid) throw "Must have uid";
+      await updateContainer({ id: containerId, nfcTagUid: uid });
+      return json<ActionData>({
+        status: "info",
+        message: "Updated Container Uid",
+      });
     }
-
     case "delete": {
       return json<ActionData>({ status: "info", message: "Tried to Delete" });
     }
     case "open": {
-      const { batch: { roastDate, roast: { name } } } = await openContainer({ containerId })
-      await updateDisplay({ name, date: roastDate! })
-
-      return json<ActionData>({ status: "success", message: "Success" });
+      const {
+        batch: {
+          roastDate,
+          roast: { name },
+        },
+      } = await openContainer({ containerId });
+      await updateDisplay({ name, date: roastDate! });
     }
   }
 }
@@ -78,24 +89,21 @@ export default function Actions() {
   const formRef = useRef<HTMLFormElement>(null);
   const [params, setSearchParams] = useSearchParams();
   const actionData = useActionData<ActionData>();
-  const { containers } = useLoaderData<LoaderData>()
+  const { containers } = useLoaderData<LoaderData>();
   const transistion = useTransition();
   const [alertOpen, setAlertOpen] = useState(false);
-  const [showNFC, setShowNFC] = useState(false)
-  const { connected } = useContainerUid()
+  const [showNFC, setShowNFC] = useState(false);
+  const { connected } = useContainerUid();
 
-
-  const isSubmitting = transistion.state == "submitting"
-
-
+  const isSubmitting = transistion.state == "submitting";
 
   useEffect(() => {
     if (!actionData) return;
 
     if (actionData.status == "success") {
-      formRef.current?.reset()
+      formRef.current?.reset();
     }
-    setAlertOpen(true)
+    setAlertOpen(true);
   }, [actionData]);
 
   const handleClose = () => setAlertOpen(false);
@@ -115,7 +123,12 @@ export default function Actions() {
           {actionData?.message}
         </Alert>
       </Snackbar>
-      <Form ref={formRef} method="post" style={{ gap: 10, display: "grid" }} replace>
+      <Form
+        ref={formRef}
+        method="post"
+        style={{ gap: 10, display: "grid" }}
+        replace
+      >
         <TextField
           name="containerId"
           defaultValue={containerId || ""}
@@ -125,7 +138,6 @@ export default function Actions() {
           fullWidth
           label="Container ID"
         />
-
 
         <div>
           <Button
@@ -164,39 +176,42 @@ export default function Actions() {
         {showNFC ? (
           <>
             <ContainerUid />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 12,
+              }}
+            >
               <Button color="secondary" onClick={() => setShowNFC(false)}>
                 Cancel
               </Button>
-
 
               <Button
                 type="submit"
                 name="action"
                 disabled={!connected}
                 value="update-nfc-uid"
-              >{connected ? "Update UID" : "No NFC Server"}</Button>
+              >
+                {connected ? "Update UID" : "No NFC Server"}
+              </Button>
             </div>
           </>
         ) : (
-
-          <Button onClick={() => setShowNFC(true)}>
-            Update UID
-          </Button>
+          <Button onClick={() => setShowNFC(true)}>Update UID</Button>
         )}
-
       </Form>
       <Stack>
-        {containers.map(container => {
+        {containers.map((container) => {
           return (
-
             <ListItem key={container.id}>
-              {container.id} |{container.batchId}| {container?.batch?.roast.name} | {format(new Date(container!.batch!.roastDate!), "MM/dd/yyyy")} | {container?.containerId}
+              {container.id} |{container.batchId}|{" "}
+              {container?.batch?.roast.name} |{" "}
+              {format(new Date(container!.batch!.roastDate!), "MM/dd/yyyy")} |{" "}
+              {container?.containerId}
             </ListItem>
-          )
+          );
         })}
-
-
       </Stack>
     </>
   );

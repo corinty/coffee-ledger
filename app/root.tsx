@@ -1,4 +1,4 @@
-import { useContext, } from "react";
+import { useContext } from "react";
 import { json } from "@remix-run/node";
 import type {
   LinksFunction,
@@ -14,38 +14,33 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import { withEmotionCache } from "@emotion/react";
-import { IoProvider } from "socket.io-react-hook"
+import { IoProvider } from "socket.io-react-hook";
+import styles from "./styles/app.css";
 
 import { unstable_useEnhancedEffect as useEnhancedEffect } from "@mui/material";
 import theme from "./src/theme";
 import ClientStyleContext from "./src/ClientStyleContex";
 
-// import tailwindStylesheetUrl from "./styles/tailwind.css";
-import globalStyles from "./styles/global.css";
-
-
 import { getUser } from "./session.server";
-
-
 
 type LoaderData = {
   user: Awaited<ReturnType<typeof getUser>>;
   ENV: {
-    SOCKET_SERVER: string
-  }
+    SOCKET_SERVER: string;
+  };
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
   return json<LoaderData>({
     user: await getUser(request),
     ENV: {
-      SOCKET_SERVER: process.env.SOCKET_SERVER!
+      SOCKET_SERVER: process.env.SOCKET_SERVER!,
     },
   });
 };
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: globalStyles }];
+  return [{ rel: "stylesheet", href: styles }];
 };
 
 export const meta: MetaFunction = () => ({
@@ -62,9 +57,6 @@ interface DocumentProps {
 const Document = withEmotionCache(
   ({ children, title }: DocumentProps, emotionCache) => {
     const clientStyleData = useContext(ClientStyleContext);
-
-
-
 
     // Only executed on client
     useEnhancedEffect(() => {
@@ -83,14 +75,13 @@ const Document = withEmotionCache(
     }, []);
 
     return (
-      <html lang="en">
+      <html lang="en" data-theme="synthwave">
         <head>
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width,initial-scale=1" />
           <meta name="theme-color" content={theme.palette.primary.main} />
           {title ? <title>{title}</title> : null}
           <Meta />
-          <Links />
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
@@ -99,21 +90,18 @@ const Document = withEmotionCache(
             name="emotion-insertion-point"
             content="emotion-insertion-point"
           />
+          <Links />
         </head>
         <body>
-          <main style={{ maxWidth: 750, margin: "0 auto" }}>
-            <IoProvider>
-              {children}
-            </IoProvider>
+          <main
+            style={{ maxWidth: 750, margin: "0 auto" }}
+            className="prose prose-base "
+          >
+            <IoProvider>{children}</IoProvider>
             <ScrollRestoration />
             <Scripts />
             <LiveReload />
-            <script>
-              {
-
-              }
-              {}
-            </script>
+            <script></script>
           </main>
         </body>
       </html>
