@@ -10,3 +10,7 @@ body{
   text-decoration: none;
   pointer-events: none;
 }
+
+a.btn {
+  text-decoration: none;
+}

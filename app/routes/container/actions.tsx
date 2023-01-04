@@ -9,6 +9,7 @@ import { json } from "@remix-run/server-runtime";
 import { zfd } from "zod-form-data";
 import { format } from "date-fns";
 
+import type { ReactNode } from "react";
 import { useState, useEffect, useRef } from "react";
 import type { AlertColor } from "@mui/material";
 import {
@@ -23,6 +24,7 @@ import {
   Delete as DeleteIcon,
   Clear as ClearIcon,
   MeetingRoom,
+  Update as UpdateIcon,
 } from "@mui/icons-material";
 import styles from "~/styles/container/actions.css";
 import { getOpenLedgerEntries } from "~/models/containerLedger.server";
@@ -31,10 +33,13 @@ import { z } from "zod";
 import { useContainerUid } from "~/hooks/useContainerUid";
 import { updateDisplay } from "~/models/meta.server";
 import { openContainer, updateContainer } from "~/models/container.server";
+import clsx from "clsx";
 
 export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
+
+type ContainerActions = "open" | "delete" | "update-nfc-uid";
 
 type LoaderData = {
   containers: Awaited<ReturnType<typeof getOpenLedgerEntries>>;
@@ -81,21 +86,36 @@ export async function action({ request }: { request: Request }) {
         },
       } = await openContainer({ containerId });
       await updateDisplay({ name, date: roastDate! });
+      return json<ActionData>({
+        status: "success",
+        message: "Opened Container",
+      });
     }
   }
 }
 
 export default function Actions() {
-  const formRef = useRef<HTMLFormElement>(null);
-  const [params, setSearchParams] = useSearchParams();
   const actionData = useActionData<ActionData>();
   const { containers } = useLoaderData<LoaderData>();
-  const transistion = useTransition();
+
+  const formRef = useRef<HTMLFormElement>(null);
+  const [params, setSearchParams] = useSearchParams();
+
+  const { state, submission } = useTransition();
+
   const [alertOpen, setAlertOpen] = useState(false);
   const [showNFC, setShowNFC] = useState(false);
+
   const { connected } = useContainerUid();
 
-  const isSubmitting = transistion.state == "submitting";
+  const isActionSubmitted = (action: ContainerActions) => {
+    if (!isSubmitting || !submission?.formData) return false;
+    const activeAction = schema.parse(submission.formData).action;
+    return action === activeAction;
+  };
+
+  console.log();
+  const isSubmitting = state == "submitting";
 
   useEffect(() => {
     if (!actionData) return;
@@ -108,10 +128,38 @@ export default function Actions() {
 
   const handleClose = () => setAlertOpen(false);
 
+  const ActionButton = ({
+    text,
+    action,
+    icon,
+    disabled,
+  }: {
+    text: string;
+    disabled?: boolean;
+    action: ContainerActions;
+    icon?: ReactNode;
+  }) => {
+    const isSubmitting = isActionSubmitted(action);
+    return (
+      <button
+        className={clsx("gap-3 btn", { loading: isSubmitting })}
+        disabled={disabled || isSubmitting}
+        type="submit"
+        name="action"
+        value={action}
+      >
+        {!isSubmitting && icon && icon}
+        {text}
+      </button>
+    );
+  };
+
   const containerId = params.get("id");
   return (
     <>
-      <h2>Actions</h2>
+      <div>
+        <h2>Actions</h2>
+      </div>
       <Snackbar
         open={alertOpen}
         onClose={handleClose}
@@ -123,56 +171,49 @@ export default function Actions() {
           {actionData?.message}
         </Alert>
       </Snackbar>
-      <Form
-        ref={formRef}
-        method="post"
-        style={{ gap: 10, display: "grid" }}
-        replace
-      >
-        <TextField
-          name="containerId"
-          defaultValue={containerId || ""}
-          required
-          disabled={isSubmitting}
-          inputProps={{ pattern: "[0-9]*" }}
-          fullWidth
-          label="Container ID"
-        />
-
-        <div>
-          <Button
-            style={{ float: "right" }}
-            endIcon={<ClearIcon />}
-            color="secondary"
+      <Form ref={formRef} method="post" className="flex flex-col gap-4" replace>
+        <div className="input-group">
+          <input
+            type="text"
+            placeholder="Search…"
+            name="containerId"
+            defaultValue={containerId || ""}
+            className="w-full input input-bordered"
+            disabled={isSubmitting}
+            pattern={"[0-9]*"}
+          />
+          <button
+            className={clsx("gap-1 btn", { loading: isSubmitting })}
             type="reset"
             onClick={() => {
               setSearchParams({});
             }}
           >
             Clear
-          </Button>
+            <ClearIcon />
+          </button>
         </div>
+        {/* <TextField
+          name="containerId"
+          defaultValue={containerId || ""}
+          required
+          disabled={isSubmitting}
+          inputProps={{ pattern: "[0-9]*" }}
+          label="Container ID"
+        /> */}
+        <ActionButton
+          action="open"
+          text="Open"
+          icon={<MeetingRoom />}
+          disabled={showNFC}
+        />
+        <ActionButton
+          action="delete"
+          text="Delete"
+          icon={<DeleteIcon />}
+          disabled={showNFC}
+        />
 
-        <Button
-          disabled={showNFC || isSubmitting}
-          fullWidth
-          type="submit"
-          name="action"
-          value="open"
-          startIcon={<MeetingRoom />}
-        >
-          Open
-        </Button>
-        <Button
-          disabled={showNFC || isSubmitting}
-          fullWidth
-          type="submit"
-          name="action"
-          value="delete"
-          startIcon={<DeleteIcon />}
-        >
-          Delete
-        </Button>
         {showNFC ? (
           <>
             <ContainerUid />
@@ -187,18 +228,18 @@ export default function Actions() {
                 Cancel
               </Button>
 
-              <Button
-                type="submit"
-                name="action"
+              <ActionButton
                 disabled={!connected}
-                value="update-nfc-uid"
-              >
-                {connected ? "Update UID" : "No NFC Server"}
-              </Button>
+                action="update-nfc-uid"
+                text={connected ? "Update UID" : "No NFC Server"}
+              />
             </div>
           </>
         ) : (
-          <Button onClick={() => setShowNFC(true)}>Update UID</Button>
+          <button className="gap-3 btn" onClick={() => setShowNFC(true)}>
+            <UpdateIcon />
+            Update UID
+          </button>
         )}
       </Form>
       <Stack>

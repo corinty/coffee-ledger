@@ -1,26 +1,8 @@
 import { Button } from "@mui/material";
-import {
-  useNavigate,
-  useParams,
-  Form,
-  useTransition,
-  useLoaderData,
-} from "@remix-run/react";
-import type { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
+import { Form, useTransition, Link } from "@remix-run/react";
+import type { ActionFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import { setActiveBatch } from "~/models/batch.server";
-import { getActiveBatchId, updateDisplay } from "~/models/meta.server";
-
-interface LoaderData {
-  activeBatchId: string | undefined;
-}
-export const loader: LoaderFunction = async () => {
-  const activeBatchId = await getActiveBatchId();
-
-  return json<LoaderData>({
-    activeBatchId,
-  });
-};
 
 export const action: ActionFunction = async ({ params }) => {
   const { batchId } = params;
@@ -39,19 +21,21 @@ export const action: ActionFunction = async ({ params }) => {
 };
 
 export default function BatchRoot() {
-  const { activeBatchId } = useLoaderData<LoaderData>();
-  const navigate = useNavigate();
   const { state } = useTransition();
   return (
-    <>
-      <Button variant="outlined" onClick={() => navigate("process")}>
+    <div className="flex gap-3 my-4">
+      <Link to={"process"} className="btn btn-outline">
         Process
-      </Button>
+      </Link>
       <Form method="post">
-        <Button type="submit" disabled={state === "submitting"}>
+        <button
+          className="btn btn-outline"
+          type="submit"
+          disabled={state === "submitting"}
+        >
           {state === "submitting" ? "Updating..." : "Set as Active Batch"}
-        </Button>
+        </button>
       </Form>
-    </>
+    </div>
   );
 }

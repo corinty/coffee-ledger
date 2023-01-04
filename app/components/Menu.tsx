@@ -13,7 +13,7 @@ export default function Menu({ children }) {
       </div>
       <div className="drawer-side">
         <label htmlFor="my-drawer" className="drawer-overlay"></label>
-        <ul className="p-2 menu bg-base-300 w-52 text-content text-slate">
+        <ul className="p-2 text-white menu bg-base-300 w-52 text-content">
           <li>
             <NavLink to={"/"}>Overview</NavLink>
           </li>
@@ -21,7 +21,7 @@ export default function Menu({ children }) {
             <NavLink to={"/container/actions"}>Container Actions</NavLink>
           </li>
           <li>
-            <NavLink to={"/batch"}>Batches</NavLink>
+            <NavLink to={"/batch"}>Batch</NavLink>
           </li>
         </ul>
       </div>
