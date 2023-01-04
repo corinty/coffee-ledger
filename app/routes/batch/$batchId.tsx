@@ -1,8 +1,15 @@
 import { Button } from "@mui/material";
 import type { ContainerLedger } from "@prisma/client";
-import { Link, Outlet, useLoaderData, useFetcher, useTransition } from "@remix-run/react";
+import {
+  Link,
+  Outlet,
+  useLoaderData,
+  useFetcher,
+  useTransition,
+} from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
+import { prisma } from "~/db.server";
 import { getBatchById } from "~/models/batch.server";
 import { formatShortDate } from "~/utils";
 
@@ -13,19 +20,22 @@ type LoaderData = {
 export const loader: LoaderFunction = async ({ params }) => {
   const batch = await getBatchById({ batchId: params.batchId! });
 
-  return json<LoaderData>({ batch: batch });
+  return json<LoaderData>({
+    batch: batch,
+  });
 };
 
 export default function Batch() {
   const { batch } = useLoaderData<LoaderData>();
-  const transition = useTransition();
   return (
     <>
       <h2>Batch: {batch.id} </h2>
 
       <div>Coffee: {batch.roast.name}</div>
       <div>Roaster: {batch.roast.roaster.name}</div>
-      <div>Roast Date: {batch.roastDate ? formatShortDate(batch.roastDate) : "N/A"}</div>
+      <div>
+        Roast Date: {batch.roastDate ? formatShortDate(batch.roastDate) : "N/A"}
+      </div>
       <section>
         <Outlet context={batch} />
       </section>
@@ -69,7 +79,13 @@ function LedgerEntry({
       </ul>
       {!dateOut && (
         <ledgerFetcher.Form method="delete" action="/ledger/close">
-          <input type="text" hidden name="containerId" value={containerId} readOnly />
+          <input
+            type="text"
+            hidden
+            name="containerId"
+            value={containerId}
+            readOnly
+          />
           <input type="text" hidden name="batchId" value={batchId} readOnly />
           {allowClose && (
             <Button variant="contained" type="submit">

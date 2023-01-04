@@ -8,7 +8,7 @@
     "socket": "PORT=3002 nodemon --esm --swc socket.server.ts",
     "build": "npm run build:css && remix build",
     "build:css": "tailwindcss -m -i ./styles/app.css -o app/styles/app.css",
-    "dev": "concurrently \"npm run dev:css\" \"remix dev\"",
+    "dev": "concurrently \"remix dev\" \"npm run dev:css\"",
     "dev:css": "tailwindcss -w -i ./styles/app.css -o app/styles/app.css"
   },
   "prisma": {

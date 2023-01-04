@@ -19,9 +19,10 @@ import styles from "./styles/app.css";
 
 import { unstable_useEnhancedEffect as useEnhancedEffect } from "@mui/material";
 import theme from "./src/theme";
-import ClientStyleContext from "./src/ClientStyleContex";
+import ClientStyleContext from "~/src/ClientStyleContex";
 
 import { getUser } from "./session.server";
+import Menu from "~/components/Menu";
 
 type LoaderData = {
   user: Awaited<ReturnType<typeof getUser>>;
@@ -75,7 +76,7 @@ const Document = withEmotionCache(
     }, []);
 
     return (
-      <html lang="en" data-theme="synthwave">
+      <html lang="en" data-theme="dark">
         <head>
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -93,24 +94,21 @@ const Document = withEmotionCache(
           <Links />
         </head>
         <body>
-          <main
-            style={{ maxWidth: 750, margin: "0 auto" }}
-            className="prose prose-base "
-          >
-            <IoProvider>{children}</IoProvider>
-            <ScrollRestoration />
-            <Scripts />
-            <LiveReload />
-            <script></script>
-          </main>
+          <Menu>
+            <main style={{ maxWidth: 750, margin: "0 auto" }} className="prose">
+              <IoProvider>{children}</IoProvider>
+              <ScrollRestoration />
+              <Scripts />
+              <LiveReload />
+              <script></script>
+            </main>
+          </Menu>
         </body>
       </html>
     );
   }
 );
 
-// https://remix.run/api/conventions#default-export
-// https://remix.run/api/conventions#route-filenames
 export default function App() {
   return (
     <Document>

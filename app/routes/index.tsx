@@ -27,7 +27,7 @@ export default function Index() {
       ) : (
         <section>No Active Batch Selected</section>
       )}
-      <nav className="btm-nav">
+      <nav className="flex gap-4 mt-7">
         <ButtonLink to="/container/actions">Container Actions</ButtonLink>
         <ButtonLink to="/batch">Batches</ButtonLink>
         <ButtonLink to="/batch/new">New Batch</ButtonLink>
